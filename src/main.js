@@ -106,15 +106,47 @@ function generateXLS() {
   this.converter(txtFile?.files[0]);
 }
 
+const sideTit = ["设备类型", "品牌", "客户端", "主域", "子域"];
+
 function converter(file) {
   const reader = new FileReader();
   reader.onload = function (e) {
     const txtContent = e.target.result;
+    let sideData = [];
+    if (txtContent.startsWith("0113")) {
+      sideData.push("3013", "1", "hmct", "208", "301");
+    } else if (txtContent.startsWith("0012")) {
+      sideData.push("3012", "0", "Unbound", "208", "299");
+    } else if (txtContent.startsWith("0016")) {
+      sideData.push("3014", "0", "juhaokan", "208", "304");
+    } else if (txtContent.startsWith("000d")) {
+      sideData.push("3011", "0", "Unbound", "208", "296");
+    } else if (txtContent.startsWith("0108")) {
+      sideData.push("3006", "1", "hmct", "208", "295");
+    } else if (txtContent.startsWith("0107")) {
+      sideData.push("3007", "1", "hmct", "208", "285");
+    } else if (txtContent.startsWith("020a")) {
+      sideData.push("3009", "2", "hmct", "208", "275");
+    } else if (txtContent.startsWith("0206")) {
+      sideData.push("3008", "2", "hmct", "208", "275");
+    }
     // 将文本内容按行分割
     const lines = txtContent.split("\n");
     const data = [["设备码"]];
     for (let i = 0; i < lines.length; i++) {
       // 假设每行内容为一个单元格的数据
+      if (i >= 2 && i < 7) {
+        newline = [
+          lines[i],
+          "",
+          "",
+          "",
+          sideTit[i - 2] ?? "",
+          sideData[i - 2] ?? "",
+        ];
+        data.push(newline);
+        continue;
+      }
       data.push([lines[i]]);
     }
     const worksheet = XLSX.utils.aoa_to_sheet(data);
